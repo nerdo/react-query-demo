@@ -10,6 +10,7 @@
   "dependencies": {
     "@faker-js/faker": "^7.5.0",
     "@tanstack/react-query": "^4.3.9",
+    "@tanstack/react-query-devtools": "^4.3.9",
     "miragejs": "^0.1.45",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
