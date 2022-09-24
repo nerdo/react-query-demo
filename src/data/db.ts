@@ -3,12 +3,15 @@ import { ModelDefinition } from 'miragejs/-types'
 import { z } from 'zod'
 import { faker } from '@faker-js/faker'
 
+const NUM_CONTACTS = 20
+
 // MirageJS doesn't have first-class TS support, but this gets types working...
 // https://github.com/miragejs/miragejs/issues/460#issuecomment-733123712
 
 const zContact = z.object({
   name: z.string().min(1),
   email: z.string().email().min(5).optional(),
+  avatarUrl: z.string().url().optional(),
   address: z
     .object({
       street: z.string().min(1),
@@ -31,15 +34,16 @@ const server = createServer({
     // Make the fake data deterministic with a fixed seed
     faker.seed(195939218)
 
-    for (let i = 0; i < 500; i++) {
+    for (let i = 0; i < NUM_CONTACTS; i++) {
       const name = faker.name.fullName()
+      const avatarUrl = i % 9 !== 0 ? faker.internet.avatar() : void 0
       const address =
         i % 8 !== 0
           ? { street: faker.address.streetAddress(), city: faker.address.city(), state: faker.address.stateAbbr(), zip: faker.address.zipCode() }
           : void 0
       const email = i % 7 === 0 ? faker.internet.email() : void 0
 
-      server.create('contact', { name, email, address })
+      server.create('contact', { name, email, avatarUrl, address })
     }
   },
 })
