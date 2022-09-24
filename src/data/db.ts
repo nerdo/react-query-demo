@@ -34,7 +34,7 @@ const server = createServer({
     for (let i = 0; i < 500; i++) {
       const name = faker.name.fullName()
       const address =
-        i % 3 === 0
+        i % 8 !== 0
           ? { street: faker.address.streetAddress(), city: faker.address.city(), state: faker.address.stateAbbr(), zip: faker.address.zipCode() }
           : void 0
       const email = i % 7 === 0 ? faker.internet.email() : void 0
