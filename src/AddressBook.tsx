@@ -1,30 +1,29 @@
-import { QueryKey, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Contact, ContactUpdate } from './data/db'
 import fetchContacts from './data/fetchContacts'
-
-type Contact = Awaited<ReturnType<typeof fetchContacts>>[number]
+import updateContact from './data/updateContact'
 
 interface AddressBookEntryProps {
-  queryKey: QueryKey
   contact: Contact
 }
 
 const AddressBookEntry = (props: AddressBookEntryProps) => {
-  const { queryKey, contact } = props
+  const { contact } = props
 
   const queryClient = useQueryClient()
 
   const mutation = useMutation(
-    async (incoming: Partial<Contact>) => {
-      contact.name = incoming.name!
+    async (incoming: ContactUpdate) => {
+      return updateContact(incoming.id, incoming)
     },
     {
-      onSuccess() {},
+      onSuccess() {
+        queryClient.invalidateQueries(['contacts'])
+      },
     }
   )
   const updateName = (c: Contact) => {
-    console.debug('updating contact', queryKey, c)
-    // queryClient.setQueryData(queryKey, { ...c, name: 'George Castanza' })
-    mutation.mutate({ name: 'George Castanza' })
+    mutation.mutate({ id: c.id, name: 'George Castanza', address: { zip: '12345' } })
   }
 
   return (
@@ -37,7 +36,18 @@ const AddressBookEntry = (props: AddressBookEntryProps) => {
         <div className="flex items-start card-title align-baseline">
           {contact.avatarUrl && (
             <div className="flex-grow-0">
-              <img src={contact.avatarUrl} alt={contact.name} width="32" height="32" className="rounded-full" />
+              {/* Use first and last initial in avatar alt tag */}
+              <img
+                src={contact.avatarUrl}
+                alt={contact.name
+                  .split(/\s+/)
+                  .filter((_, i, array) => i === 0 || i === array.length - 1)
+                  .map((name) => name[0])
+                  .join('')}
+                width="32"
+                height="32"
+                className="rounded-full"
+              />
             </div>
           )}
           <h3 className="flex-1">{contact.name}</h3>
@@ -59,7 +69,7 @@ const AddressBookEntry = (props: AddressBookEntryProps) => {
 
         <div className="card-actions self-center">
           <button className="btn btn-default" onClick={() => updateName(contact)}>
-            Update Name
+            Test Update
           </button>
         </div>
       </div>
@@ -81,9 +91,9 @@ const AddressBook = () => {
   const contacts = contactQuery.data
 
   return (
-    <div className="grid grid-cols-5 gap-10 p-10">
+    <div className="grid grid-cols-3 gap-10 p-10">
       {contacts.map((contact) => (
-        <AddressBookEntry key={contact.id} queryKey={['contacts', { id: contact.id }]} contact={contact} />
+        <AddressBookEntry key={contact.id} contact={contact} />
       ))}
     </div>
   )

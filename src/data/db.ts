@@ -23,6 +23,8 @@ const zContact = z.object({
 })
 export type Contact = { id: any } & z.infer<typeof zContact>
 
+export type ContactUpdate = Required<Pick<Contact, 'id'>> & { address?: Partial<Contact['address']> } & Partial<Omit<Contact, 'address'>>
+
 const ContactModel: ModelDefinition<Contact> = Model.extend({})
 
 const server = createServer({
@@ -51,6 +53,22 @@ const server = createServer({
 export const db = {
   fetchContacts: async () => {
     return server.schema.all('contact')
+  },
+
+  updateContact: async (id: Contact['id'], props: Partial<Omit<Contact, 'id'>>) => {
+    const contact = server.schema.findBy('contact', { id })
+
+    if (!contact) throw new Error(`Contact #${id} not found.`)
+
+    contact.update({
+      ...props,
+      address: {
+        ...(contact.attrs as Contact).address,
+        ...(props.address || {}),
+      },
+    })
+
+    return contact
   },
 }
 
