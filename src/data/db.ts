@@ -45,7 +45,8 @@ const server = createServer({
           : void 0
       const email = i % 7 === 0 ? faker.internet.email() : void 0
 
-      server.create('contact', { name, email, avatarUrl, address })
+      const contact = server.create('contact')
+      contact.update({ name, email, avatarUrl, address })
     }
   },
 })
