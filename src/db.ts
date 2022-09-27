@@ -3,7 +3,7 @@ import { ModelDefinition } from 'miragejs/-types'
 import { z } from 'zod'
 import { faker } from '@faker-js/faker'
 
-const NUM_CONTACTS = 20
+const NUM_CONTACTS = 75
 
 // MirageJS doesn't have first-class TS support, but this gets types working...
 // https://github.com/miragejs/miragejs/issues/460#issuecomment-733123712
@@ -54,6 +54,19 @@ const server = createServer({
 export const db = {
   getContacts: async () => {
     return server.schema.all('contact')
+  },
+
+  pageContacts: async (settings: { cursor: number; limit: number }) => {
+    const { cursor, limit } = settings
+
+    const collection = server.schema.all('contact')
+    const slice = collection.slice(cursor, cursor + limit)
+    const nextCursor = cursor + slice.length < collection.length ? cursor + slice.length : void 0
+
+    return {
+      slice,
+      nextCursor,
+    }
   },
 
   updateContact: async (props: ContactUpdate) => {

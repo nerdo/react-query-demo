@@ -1,5 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { fetchContacts, updateContact, Contact, ContactUpdate } from './api'
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import React from 'react'
+import { updateContact, Contact, ContactUpdate, pageContacts } from './api'
 
 interface AddressBookEntryProps {
   contact: Contact
@@ -77,8 +78,11 @@ const ContactCard = (props: AddressBookEntryProps) => {
 }
 
 const ContactList = () => {
-  const contactQuery = useQuery(['contacts'], fetchContacts)
+  const contactQuery = useInfiniteQuery(['contacts'], ({ pageParam }) => pageContacts({ cursor: pageParam || 0, limit: 20 }), {
+    getNextPageParam: (lastPage, _pages) => lastPage.nextCursor,
+  })
   const queryClient = useQueryClient()
+  type ContactQueryData = typeof contactQuery.data
 
   if (contactQuery.status === 'loading') {
     return <div>Loading...</div>
@@ -88,23 +92,46 @@ const ContactList = () => {
     return <div>Error!</div>
   }
 
-  const contacts = contactQuery.data
-
   return (
     <div className="grid grid-cols-3 gap-10 p-10">
-      {contacts.map((contact, i) => (
-        <ContactCard
-          key={contact.id}
-          contact={contact}
-          onUpdateContact={(contact) => {
-            queryClient.setQueryData<Contact[]>(['contacts'], (oldData) => {
-              const newContacts = [...oldData || []]
-              newContacts.splice(i, 1, contact)
-              return newContacts
-            })
-          }}
-        />
+      {contactQuery.data.pages.map((page, p) => (
+        <React.Fragment key={p}>
+          {page.data.map((contact, i) => (
+            <ContactCard
+              key={contact.id}
+              contact={contact}
+              onUpdateContact={(contact) => {
+                queryClient.setQueryData<ContactQueryData>(['contacts'], (oldData) => {
+                  const newPages = [...(oldData?.pages || [])]
+                  const newPageData = [...(newPages[p].data || [])]
+
+                  newPageData.splice(i, 1, contact)
+                  newPages[p] = {
+                    ...newPages[p],
+                    data: newPageData,
+                  }
+
+                  return {
+                    pages: newPages,
+                    pageParams: oldData?.pageParams || [],
+                  }
+                })
+              }}
+            />
+          ))}
+        </React.Fragment>
       ))}
+
+      <div className="justify-self-center place-self-center">
+        <button
+          onClick={() => contactQuery.fetchNextPage()}
+          disabled={!contactQuery.hasNextPage || contactQuery.isFetchingNextPage}
+          className="btn btn-default"
+        >
+          {contactQuery.isFetchingNextPage ? 'Loading more...' : contactQuery.hasNextPage ? 'Load More' : 'No more!'}
+        </button>
+      </div>
+      <div>{contactQuery.isFetching && contactQuery.isFetchingNextPage ? 'Fetching...' : null}</div>
     </div>
   )
 }
