@@ -1,13 +1,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import AddressBook from './AddressBook'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import ContactList from './ContactList'
 
 function App() {
   const queryClient = new QueryClient()
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AddressBook />
+      <ContactList />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )

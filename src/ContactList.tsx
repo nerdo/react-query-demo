@@ -8,7 +8,7 @@ interface AddressBookEntryProps {
   onUpdateContact?: (contact: Contact) => unknown
 }
 
-const AddressBookEntry = (props: AddressBookEntryProps) => {
+const ContactCard = (props: AddressBookEntryProps) => {
   const { contact, onUpdateContact } = props
 
   const mutation = useMutation(
@@ -17,8 +17,8 @@ const AddressBookEntry = (props: AddressBookEntryProps) => {
     },
     {
       onSuccess: (c) => {
-        onUpdateContact?.(c as any as Contact)
-      }
+        onUpdateContact?.(c)
+      },
     }
   )
   const updateName = (c: Contact) => {
@@ -76,7 +76,7 @@ const AddressBookEntry = (props: AddressBookEntryProps) => {
   )
 }
 
-const AddressBook = () => {
+const ContactList = () => {
   const contactQuery = useQuery(['contacts'], fetchContacts)
   const queryClient = useQueryClient()
 
@@ -93,7 +93,7 @@ const AddressBook = () => {
   return (
     <div className="grid grid-cols-3 gap-10 p-10">
       {contacts.map((contact, i) => (
-        <AddressBookEntry
+        <ContactCard
           key={contact.id}
           contact={contact}
           onUpdateContact={(contact) => {
@@ -111,4 +111,4 @@ const AddressBook = () => {
   )
 }
 
-export default AddressBook
+export default ContactList
