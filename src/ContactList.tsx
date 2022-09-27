@@ -98,10 +98,8 @@ const ContactList = () => {
           contact={contact}
           onUpdateContact={(contact) => {
             queryClient.setQueryData<Contact[]>(['contacts'], (oldData) => {
-              const oldContacts = oldData || []
-              const contactsBeforeCurrent = oldContacts.slice(0, Math.min(oldContacts.length - 1, i))
-              const contactsAfterCurrent = oldContacts.slice(Math.min(oldContacts.length, i + 1), oldContacts.length)
-              const newContacts = contactsBeforeCurrent.concat(contact, contactsAfterCurrent)
+              const newContacts = [...oldData || []]
+              newContacts.splice(i, 1, contact)
               return newContacts
             })
           }}
