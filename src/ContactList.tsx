@@ -1,7 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Contact, ContactUpdate } from './data/db'
-import fetchContacts from './data/fetchContacts'
-import updateContact from './data/updateContact'
+import { fetchContacts, updateContact, Contact, ContactUpdate } from './api'
 
 interface AddressBookEntryProps {
   contact: Contact

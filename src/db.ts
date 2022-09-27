@@ -52,7 +52,7 @@ const server = createServer({
 })
 
 export const db = {
-  fetchContacts: async () => {
+  getContacts: async () => {
     return server.schema.all('contact')
   },
 
