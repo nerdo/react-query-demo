@@ -55,10 +55,10 @@ export const db = {
     return server.schema.all('contact')
   },
 
-  updateContact: async (id: Contact['id'], props: Partial<Omit<Contact, 'id'>>) => {
-    const contact = server.schema.findBy('contact', { id })
+  updateContact: async (props: ContactUpdate) => {
+    const contact = server.schema.findBy('contact', { id: props.id })
 
-    if (!contact) throw new Error(`Contact #${id} not found.`)
+    if (!contact) throw new Error(`Contact #${props.id} not found.`)
 
     contact.update({
       ...props,
