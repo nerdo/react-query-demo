@@ -21,7 +21,7 @@ const zContact = z.object({
     })
     .optional(),
 })
-export type Contact = { id: any } & z.infer<typeof zContact>
+export type Contact = { id: number } & z.infer<typeof zContact>
 
 export type ContactUpdate = Required<Pick<Contact, 'id'>> & { address?: Partial<Contact['address']> } & Partial<Omit<Contact, 'address'>>
 
@@ -57,7 +57,7 @@ export const db = {
   },
 
   updateContact: async (props: ContactUpdate) => {
-    const contact = server.schema.findBy('contact', { id: props.id })
+    const contact = server.schema.findBy('contact', { id: `${props.id}` })
 
     if (!contact) throw new Error(`Contact #${props.id} not found.`)
 
