@@ -50,15 +50,17 @@ const ContactCard = (props: AddressBookEntryProps) => {
           <h3 className="flex-1">{contact.name}</h3>
         </div>
 
-        {contact.address && (
+        {(contact.email || contact.address) && (
           <address className="grid grid-cols-1 gap-2">
             {contact.email && <div>{contact.email}</div>}
-            <div>
-              <div>{contact.address.street}</div>
+            {contact.address && (
               <div>
-                {contact.address.city}, {contact.address.state} {contact.address.zip}
+                <div>{contact.address.street}</div>
+                <div>
+                  {contact.address.city}, {contact.address.state} {contact.address.zip}
+                </div>
               </div>
-            </div>
+            )}
           </address>
         )}
 
