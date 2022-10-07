@@ -9,10 +9,10 @@
   },
   "dependencies": {
     "@faker-js/faker": "^7.5.0",
+    "@nerdo/memorydb": "^0.0.1",
     "@tanstack/react-query": "^4.7.1",
     "@tanstack/react-query-devtools": "^4.7.1",
     "daisyui": "^2.31.0",
-    "miragejs": "^0.1.45",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zod": "^3.19.1"
